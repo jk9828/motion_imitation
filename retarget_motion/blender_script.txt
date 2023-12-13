@@ -1,0 +1,35 @@
+import bpy
+
+# Replace 'Armature' with the name of your armature object
+armature_name = 'arma'
+
+# Replace with the names of the bones you want to extract data from
+target_bone_names = ['mixamorig:Hips','mixamorig:RightShoulder','mixamorig:RightArm', 'mixamorig:RightForeArm', 'mixamorig:RightHandTip',
+'mixamorig:LeftShoulder','mixamorig:LeftArm', 'mixamorig:LeftForeArm','mixamorig:LeftHandTip',
+'mixamorig:RightUpLeg','mixamorig:RightLeg','mixamorig:RightFoot','mixamorig:RightToeBase',
+'mixamorig:RightUpLeg','mixamorig:RightLeg','mixamorig:RightFoot','mixamorig:RightToeBase']
+     
+# Get the armature by name
+armature = bpy.data.objects.get(armature_name)
+
+i = 0
+
+if armature and armature.type == 'ARMATURE':
+    # Create a text file for output
+    with open('bone_animation_data.txt', 'w') as txtfile:
+        for frame in range(bpy.context.scene.frame_start, bpy.context.scene.frame_end + 1):
+            bpy.context.scene.frame_set(frame)
+            # Iterate through the specified bones and extract data
+            i=0
+            for bone_name in target_bone_names:
+                bone = armature.pose.bones.get(bone_name)
+                i = i+1
+                if bone:
+                    bone_matrix_global = armature.matrix_world @ bone.matrix
+                    bone_position_global = bone_matrix_global.translation
+                    
+                    txtfile.write(f"{bone_position_global.x}, {bone_position_global.y}, {bone_position_global.z}")
+                    if i == len(target_bone_names):
+                        txtfile.write(f"\n")
+                    else:
+                        txtfile.write(f",")
